@@ -1,0 +1,13 @@
+{
+   "mysql" : {
+      "host" : "127.0.0.1",
+      "table" : "readings",
+      "username" : "",
+      "password" : "",
+      "database" : "timeseries"
+   },
+   "mqtt" : {
+      "host" : "127.0.0.1",
+      "topic_prefix" : "notify/"
+   }
+}
