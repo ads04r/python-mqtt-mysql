@@ -30,8 +30,13 @@ def callback(client, userdata, message):
 			payload = '1'
 		if payload == 'off':
 			payload = '0'
+		if payload == 'open':
+			payload = '1'
+		if payload == 'close':
+			payload = '0'
+		if payload == 'closed':
+			payload = '0'
 	query = "insert into " + config['mysql']['table'] + " (meter_zone, meter_type, period, value) values ('" + topic + "', '" + type + "', '" + ds + "', '" + payload + "');"
-	print(query)
 	db = pymysql.connect(config['mysql']['host'], config['mysql']['username'], config['mysql']['password'], config['mysql']['database'], autocommit=True)
 	cursor = db.cursor()
 	cursor.execute(query)
