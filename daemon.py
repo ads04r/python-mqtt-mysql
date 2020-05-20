@@ -66,5 +66,5 @@ client.connect(config['mqtt']['host'])
 client.loop_start()
 client.subscribe('#')
 while True:
-	time.sleep(1)
+	pass
 client.loop_stop()
