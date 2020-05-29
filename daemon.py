@@ -11,6 +11,7 @@ if not(os.path.exists(config_path)):
 def callback(client, userdata, message):
 
 	global config
+	global queries
 
 	topic = message.topic
 	payload = str(message.payload.decode('utf-8'))
@@ -36,17 +37,15 @@ def callback(client, userdata, message):
 			payload = '0'
 		if payload == 'closed':
 			payload = '0'
-	query = "insert into " + config['mysql']['table'] + " (meter_zone, meter_type, period, value) values ('" + topic + "', '" + type + "', '" + ds + "', '" + payload + "');"
-	db = pymysql.connect(config['mysql']['host'], config['mysql']['username'], config['mysql']['password'], config['mysql']['database'], autocommit=True)
-	cursor = db.cursor()
-	cursor.execute(query)
-	db.close()
+	query = "insert ignore into " + config['mysql']['table'] + " (meter_zone, meter_type, period, value) values ('" + topic + "', '" + type + "', '" + ds + "', '" + payload + "');"
+	queries.append(query)
 
 with open(config_path) as data:
 	config = json.load(data)
 	data.close()
 
 config['types'] = {}
+queries = []
 
 db = pymysql.connect(config['mysql']['host'], config['mysql']['username'], config['mysql']['password'], config['mysql']['database'])
 query = "select distinct meter_zone, meter_type from readings where meter_zone like '%/%';";
@@ -65,6 +64,19 @@ client.on_message = callback
 client.connect(config['mqtt']['host'])
 client.loop_start()
 client.subscribe('#')
+dtnext = datetime.datetime.now() + datetime.timedelta(seconds=60)
 while True:
-	pass
+	while datetime.datetime.now() < dtnext:
+		pass
+	q = queries
+	queries = []
+	dtnext = datetime.datetime.now() + datetime.timedelta(seconds=60)
+	if len(q) > 0:
+		db = pymysql.connect(config['mysql']['host'], config['mysql']['username'], config['mysql']['password'], config['mysql']['database'], autocommit=True)
+		cursor = db.cursor()
+		for query in q:
+			cursor.execute(query)
+		db.close()
+
 client.loop_stop()
+
