@@ -72,11 +72,14 @@ while True:
 	queries = []
 	dtnext = datetime.datetime.now() + datetime.timedelta(seconds=60)
 	if len(q) > 0:
-		db = pymysql.connect(config['mysql']['host'], config['mysql']['username'], config['mysql']['password'], config['mysql']['database'], autocommit=True)
-		cursor = db.cursor()
-		for query in q:
-			cursor.execute(query)
-		db.close()
+		try:
+			db = pymysql.connect(config['mysql']['host'], config['mysql']['username'], config['mysql']['password'], config['mysql']['database'], autocommit=True)
+			cursor = db.cursor()
+			for query in q:
+				cursor.execute(query)
+			db.close()
+		except:
+			queries = q + queries
 
 client.loop_stop()
 
